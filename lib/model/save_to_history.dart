@@ -4,7 +4,7 @@ import 'package:flutter_clock_app/helper/database_helper.dart';
 class SaveToHistoryPage extends StatelessWidget {
   final int time;
 
-  const SaveToHistoryPage({required this.time});
+  const SaveToHistoryPage({super.key, required this.time});
 
   @override
   Widget build(BuildContext context) {

@@ -12,7 +12,7 @@ class BottomNavBar extends StatefulWidget {
 
 class _BottomNavBarState extends State<BottomNavBar> {
   int _selectedIndex = 0;
-  final List<Widget> _pages = [StopwatchPage(), TimerPage(), HistoryPage()];
+  final List<Widget> _pages = [StopwatchPage(), TimerPage(), const HistoryPage()];
 
   void _onItemTapped(int index) {
     setState(() {

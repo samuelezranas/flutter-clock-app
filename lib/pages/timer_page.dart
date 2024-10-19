@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class TimerPage extends StatefulWidget {
   @override
@@ -13,9 +14,13 @@ class _TimerPageState extends State<TimerPage> {
     isLapHours: true,
   );
 
+  late AudioPlayer audioPlayer;
+
   @override
   void initState() {
     super.initState();
+    audioPlayer = AudioPlayer();
+    
     _stopWatchTimer.rawTime.listen((value) {
       if (value == 0) {
         // Ketika waktu habis, bunyikan ringtone
@@ -26,8 +31,9 @@ class _TimerPageState extends State<TimerPage> {
 
   @override
   void dispose() {
-    super.dispose();
+    audioPlayer.dispose();
     _stopWatchTimer.dispose();
+    super.dispose();
   }
 
   void _saveToHistory(int elapsedTime) async {
@@ -46,6 +52,7 @@ class _TimerPageState extends State<TimerPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('Timer')),
       body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           StreamBuilder<int>(
             stream: _stopWatchTimer.rawTime,
