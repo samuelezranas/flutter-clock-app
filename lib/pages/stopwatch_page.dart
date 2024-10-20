@@ -1,51 +1,65 @@
 import 'package:flutter/material.dart';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_clock_app/model/save_to_history.dart';
-import 'dart:async';
+import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class StopwatchPage extends StatefulWidget {
+  const StopwatchPage({Key? key}) : super(key: key);
+
   @override
   _StopwatchPageState createState() => _StopwatchPageState();
 }
 
 class _StopwatchPageState extends State<StopwatchPage> {
-  late int elapsedTime = 0;
-  late Timer _timer;
-  bool _isRunning = false;
-  AudioPlayer audioPlayer = AudioPlayer();
+  final StopWatchTimer _stopWatchTimer = StopWatchTimer();
+  bool _isRunning = false; // Status apakah stopwatch sedang berjalan atau tidak
+  late int _elapsedTime;
 
-  // Function to start the stopwatch
-  void _startTimer() {
-    _isRunning = true;
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+  @override
+  void initState() {
+    super.initState();
+    _stopWatchTimer.rawTime.listen((value) {
       setState(() {
-        elapsedTime++;
+        _elapsedTime = value;
       });
     });
   }
 
-  // Function to stop the stopwatch
-  void _stopTimer() {
-    _isRunning = false;
-    _timer.cancel();
+  @override
+  void dispose() {
+    _stopWatchTimer.dispose();
+    super.dispose();
   }
 
-  // Function to play the alarm sound
-  void _playAlarmSound() {
-    audioPlayer.play(AssetSource('sounds/alarm_sound.mp3'));
+  void _startStopTimer() {
+    if (_isRunning) {
+      // Berhenti jika sedang berjalan
+      _stopWatchTimer.onStopTimer();
+    } else {
+      // Mulai jika belum berjalan
+      _stopWatchTimer.onStartTimer();
+    }
+    setState(() {
+      _isRunning = !_isRunning; // Ganti status tombol
+    });
   }
 
-  // Function to handle finish and save
-  void _finishAndSave() {
-    _stopTimer();
-    _playAlarmSound(); // Play sound when finishing
-    // Navigate to SaveToHistoryPage
-    Navigator.push(
+  void _restartTimer() {
+    _stopWatchTimer.onResetTimer(); // Reset waktu ke 0
+    setState(() {
+      _isRunning = false; // Reset status tombol
+    });
+  }
+
+  void _saveToHistory(int elapsedTime) async {
+    final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SaveToHistoryPage(time: elapsedTime),
       ),
     );
+    if (result != null && result == true) {
+      print("Data telah disimpan ke history");
+    }
   }
 
   @override
@@ -56,31 +70,39 @@ class _StopwatchPageState extends State<StopwatchPage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Tampilan waktu berjalan
-            Text('$elapsedTime seconds', style: const TextStyle(fontSize: 48)),
+            StreamBuilder<int>(
+              stream: _stopWatchTimer.rawTime,
+              initialData: _stopWatchTimer.rawTime.value,
+              builder: (context, snapshot) {
+                final value = snapshot.data!;
+                final displayTime = StopWatchTimer.getDisplayTime(value);
+                return Text(displayTime, style: const TextStyle(fontSize: 48));
+              },
+            ),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _isRunning ? null : _startTimer,
-              child: const Text('Start'),
+              onPressed: _startStopTimer,
+              child: Text(_isRunning ? 'Stop' : 'Start'), // Ganti label berdasarkan status stopwatch
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: !_isRunning ? null : _stopTimer,
-              child: const Text('Stop'),
+              onPressed: _restartTimer, // Tombol untuk restart
+              child: const Text('Restart'),
             ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: !_isRunning ? null : _finishAndSave,
-              child: const Text('Finish and Save'),
+              onPressed: () {
+                if (_isRunning) {
+                  _stopWatchTimer.onStopTimer();
+                  _isRunning = false;
+                }
+                _saveToHistory(_elapsedTime); // Simpan hasil waktu ke history
+              },
+              child: const Text('Finish & Save'),
             ),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _timer.cancel();
-    audioPlayer.dispose();
-    super.dispose();
   }
 }

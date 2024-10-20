@@ -26,6 +26,7 @@ class SaveToHistoryPage extends StatelessWidget {
               await dbHelper.insertHistory(row);  // Menyimpan data ke SQLite
 
               // Pop after saving
+              // ignore: use_build_context_synchronously
               Navigator.of(context).pop();
             },
             child: const Text('Save'),

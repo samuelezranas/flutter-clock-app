@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_clock_app/model/save_to_history.dart';
-import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:audioplayers/audioplayers.dart';
 
 class TimerPage extends StatefulWidget {
+  const TimerPage({super.key});
+
   @override
+  // ignore: library_private_types_in_public_api
   _TimerPageState createState() => _TimerPageState();
 }
 
@@ -21,10 +23,10 @@ class _TimerPageState extends State<TimerPage> {
     super.initState();
     audioPlayer = AudioPlayer();
     
-    _stopWatchTimer.rawTime.listen((value) {
+    _stopWatchTimer.rawTime.listen((value) async {
       if (value == 0) {
         // Ketika waktu habis, bunyikan ringtone
-        FlutterRingtonePlayer.playRingtone();
+        await audioPlayer.play(AssetSource('audio/alarm.mp3')); 
       }
     });
   }
@@ -43,6 +45,7 @@ class _TimerPageState extends State<TimerPage> {
       builder: (context) => SaveToHistoryPage(time: elapsedTime),
     );
     if (result != null && result == true) {
+      // ignore: avoid_print
       print("Data telah disimpan ke history");
     }
   }
@@ -66,7 +69,7 @@ class _TimerPageState extends State<TimerPage> {
           ElevatedButton(
             onPressed: () async {
               // Simpan setelah timer selesai
-              _stopWatchTimer.onStop!();
+              _stopWatchTimer.onStopped!();
               _saveToHistory(_stopWatchTimer.rawTime.value);
             },
             child: const Text('Selesai'),
