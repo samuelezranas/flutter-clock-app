@@ -3,7 +3,7 @@ import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class StopwatchPage extends StatefulWidget {
-  const StopwatchPage({Key? key}) : super(key: key);
+  const StopwatchPage({super.key});
 
   @override
   _StopwatchPageState createState() => _StopwatchPageState();
