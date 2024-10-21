@@ -12,11 +12,11 @@ class TimerPage extends StatefulWidget {
 
 class _TimerPageState extends State<TimerPage> {
   final StopWatchTimer _stopWatchTimer = StopWatchTimer(
-    mode: StopWatchMode.countDown, // Mengubah mode menjadi countdown
+    mode: StopWatchMode.countDown, // Menggunakan mode countdown
   );
   late AudioPlayer audioPlayer;
   bool _isRunning = false;
-  int _presetTime = 3 * 60 * 1000; // Default preset ke 3 menit (dalam milidetik)
+  int _presetTime = 0 * 60 * 1000; // Default preset ke 0 menit (dalam milidetik)
   int _remainingTime = 0; // Waktu yang tersisa
 
   @override
@@ -77,17 +77,26 @@ class _TimerPageState extends State<TimerPage> {
 
   void _resetTimer() {
     _stopWatchTimer.onResetTimer();
-    _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Reset ke preset time
+    _stopWatchTimer.setPresetSecondTime(0); // Atur ulang waktu ke 0
     setState(() {
       _isRunning = false;
-      _remainingTime = _presetTime;
+      _remainingTime = 0; // Waktu kembali ke 0
     });
   }
 
-  void _setPreset(int minutes) {
+  void _adjustTime(int adjustmentInMillis) {
     setState(() {
-      _presetTime = minutes * 60 * 1000; // Ubah preset waktu berdasarkan menit
-      _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Set preset countdown time
+      // Gunakan clamp untuk memastikan waktu tidak negatif
+      _presetTime = (_presetTime + adjustmentInMillis).clamp(0, 999 * 60 * 1000);
+      
+      // Jika hasilnya adalah 0, kita bisa mengatur timer ke nilai default minimal, misalnya 1 detik.
+      if (_presetTime > 0) {
+        _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Set waktu dalam detik
+      } else {
+        _stopWatchTimer.setPresetSecondTime(1); // Set minimal 1 detik
+      }
+      
+      _remainingTime = _presetTime; // Perbarui waktu yang tersisa
     });
   }
 
@@ -95,84 +104,122 @@ class _TimerPageState extends State<TimerPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('Countdown Timer')),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          StreamBuilder<int>(
-            stream: _stopWatchTimer.rawTime,
-            initialData: _presetTime,
-            builder: (context, snapshot) {
-              final value = snapshot.data!;
-              final displayTime = StopWatchTimer.getDisplayTime(value);
-              return Text(displayTime, style: const TextStyle(fontSize: 40));
-            },
-          ),
-          const SizedBox(height: 20),
-          
-          // Preset Buttons for 3, 5, and 10 minutes
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () => _setPreset(3),
-                child: const Text('3 min'),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0), // Padding 20 dari semua sisi
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            StreamBuilder<int>(
+              stream: _stopWatchTimer.rawTime,
+              initialData: _presetTime,
+              builder: (context, snapshot) {
+                final value = snapshot.data!;
+                final displayTime = StopWatchTimer.getDisplayTime(value);
+                return Text(displayTime, style: const TextStyle(fontSize: 40));
+              },
+            ),
+            const SizedBox(height: 20),
+
+            // Time Adjustment Buttons with horizontal scroll
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _adjustTime((-5) * 60 * 1000), // Kurangi 5 menit
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue, // Warna utama
+                    foregroundColor: Colors.white, // Teks putih
+                  ),
+                  child: const Text('-5m'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _adjustTime((-60) * 1000), // Kurangi 1 menit
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('-1m'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _adjustTime((-30) * 1000), // Kurangi 30 detik
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('-30s'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => _adjustTime(30 * 1000), // Tambah 30 detik
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('+30 s'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _adjustTime(60 * 1000), // Tambah 1 menit
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('+1m'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => _adjustTime(5 * 60 * 1000), // Tambah 5 menit
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                  ),
+                  child: const Text('+5m'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Start, Pause, and Reset Buttons
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: _isRunning ? _pauseTimer : _startTimer,
+                  style: ElevatedButton.styleFrom(
+                  ),
+                  child: Text(_isRunning ? 'Pause' : 'Start'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: _resetTimer, // Tombol Reset sekarang mengatur waktu ke 0 detik
+                  style: ElevatedButton.styleFrom(
+                  ),
+                  child: const Text('Reset'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+
+            // Finish and Save Button
+            ElevatedButton(
+              onPressed: () async {
+                _pauseTimer(); // Stop timer before saving
+                _saveToHistory(_remainingTime);
+              },
+              style: ElevatedButton.styleFrom(
               ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => _setPreset(5),
-                child: const Text('5 min'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: () => _setPreset(10),
-                child: const Text('10 min'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          
-          // Slider to increase or decrease time
-          Slider(
-            value: (_presetTime / 1000).toDouble(),
-            min: 60, // 1 minute
-            max: 20 * 60, // 20 minutes
-            divisions: 19, // 1 minute increments
-            label: "${(_presetTime / 1000 / 60).round()} min",
-            onChanged: (value) {
-              setState(() {
-                _presetTime = (value * 1000).round(); // Set the time in milliseconds
-                _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Update preset time
-              });
-            },
-          ),
-          const SizedBox(height: 20),
-          
-          // Start, Pause, and Reset Buttons
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: _isRunning ? _pauseTimer : _startTimer,
-                child: Text(_isRunning ? 'Pause' : 'Start'),
-              ),
-              const SizedBox(width: 10),
-              ElevatedButton(
-                onPressed: _resetTimer,
-                child: const Text('Reset'),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          
-          // Finish and Save Button
-          ElevatedButton(
-            onPressed: () async {
-              _pauseTimer(); // Stop timer before saving
-              _saveToHistory(_remainingTime);
-            },
-            child: const Text('Finish and Save'),
-          ),
-        ],
+              child: const Text('Finish and Save'),
+            ),
+          ],
+        ),
       ),
     );
   }
