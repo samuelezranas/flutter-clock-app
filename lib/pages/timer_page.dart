@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:audioplayers/audioplayers.dart';
 
@@ -40,8 +39,7 @@ class _TimerPageState extends State<TimerPage> {
           _isRunning = false;
           _sliderValue = 0;
         });
-        
-        // Menampilkan SnackBar dengan posisi yang disesuaikan
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -50,7 +48,6 @@ class _TimerPageState extends State<TimerPage> {
                 textAlign: TextAlign.center,
               ),
               duration: const Duration(seconds: 7),
-              // Hapus behavior: SnackBarBehavior.floating dan margin
               backgroundColor: Colors.blue,
             ),
           );
@@ -66,22 +63,9 @@ class _TimerPageState extends State<TimerPage> {
     super.dispose();
   }
 
-  void _saveToHistory(int elapsedTime) async {
-    final result = await showDialog(
-      context: context,
-      builder: (context) => SaveToHistoryPage(time: elapsedTime),
-    );
-    if (result != null && result == true) {
-      // ignore: avoid_print
-      print("Data telah disimpan ke history");
-    }
-  }
-
   void _startTimer() {
     if (_sliderValue > 0) {
-      // Simpan nilai awal saat timer dimulai
       _initialTime = _sliderValue;
-      // Set ulang waktu sesuai nilai slider sebelum memulai timer
       final timeInMillis = (_sliderValue * 60 * 1000).toInt();
       _stopWatchTimer.setPresetTime(mSec: timeInMillis, add: false);
       _stopWatchTimer.onStartTimer();
@@ -115,9 +99,8 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _sliderValue = value;
         _remainingTime = timeInMillis;
-        _initialTime = value; // Update nilai awal saat slider diubah
+        _initialTime = value;
       });
-      // Set waktu preset saat slider diubah
       _stopWatchTimer.setPresetTime(mSec: timeInMillis, add: false);
     }
   }
@@ -167,6 +150,8 @@ class _TimerPageState extends State<TimerPage> {
               onChanged: _isRunning ? null : (value) {
                 _adjustTime(value);
               },
+              activeColor: Colors.blue,
+              inactiveColor: Colors.blue[100],
             ),
             const SizedBox(height: 20),
 
@@ -175,23 +160,41 @@ class _TimerPageState extends State<TimerPage> {
               children: [
                 ElevatedButton(
                   onPressed: _sliderValue > 0 ? (_isRunning ? _pauseTimer : _startTimer) : null,
-                  child: Text(_isRunning ? 'Pause' : 'Start'),
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(20),
+                    side: BorderSide(
+                      color: Colors.blue, // Outline biru
+                      width: 2,
+                    ),
+                    backgroundColor:
+                        _isRunning ? Colors.blue : Colors.white, // Biru saat pause, putih saat start
+                  ),
+                  child: Icon(
+                    _isRunning ? Icons.pause : Icons.play_arrow,
+                    size: 30,
+                    color: _isRunning ? Colors.white : Colors.blue, // Ikon putih saat pause, biru saat start
+                  ),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: _resetTimer,
-                  child: const Text('Reset'),
+                  style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    padding: const EdgeInsets.all(20),
+                    side: const BorderSide(
+                      color: Colors.blue, // Outline biru
+                      width: 2,
+                    ),
+                    backgroundColor: Colors.white, // Latar belakang putih
+                  ),
+                  child: const Icon(
+                    Icons.refresh,
+                    size: 30,
+                    color: Colors.blue, // Ikon biru
+                  ),
                 ),
               ],
-            ),
-            const SizedBox(height: 20),
-
-            ElevatedButton(
-              onPressed: () async {
-                _pauseTimer();
-                _saveToHistory(_remainingTime);
-              },
-              child: const Text('Finish and Save'),
             ),
           ],
         ),
