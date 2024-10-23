@@ -16,15 +16,13 @@ class _TimerPageState extends State<TimerPage> {
   );
   late AudioPlayer audioPlayer;
   bool _isRunning = false;
-  int _presetTime = 0 * 60 * 1000; // Default preset ke 0 menit (dalam milidetik)
+  double _sliderValue = 0; // Nilai slider yang diatur pengguna
   int _remainingTime = 0; // Waktu yang tersisa
 
   @override
   void initState() {
     super.initState();
     audioPlayer = AudioPlayer();
-
-    _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Set preset countdown time in seconds
 
     _stopWatchTimer.rawTime.listen((value) async {
       setState(() {
@@ -77,26 +75,20 @@ class _TimerPageState extends State<TimerPage> {
 
   void _resetTimer() {
     _stopWatchTimer.onResetTimer();
-    _stopWatchTimer.setPresetSecondTime(0); // Atur ulang waktu ke 0
+    _stopWatchTimer.setPresetSecondTime(0); // Atur ulang waktu ke 0 detik
     setState(() {
       _isRunning = false;
-      _remainingTime = 0; // Waktu kembali ke 0
+      _sliderValue = 0; // Reset slider value
+      _remainingTime = 0; // Reset remaining time
     });
   }
 
-  void _adjustTime(int adjustmentInMillis) {
+  void _adjustTime(double value) {
     setState(() {
-      // Gunakan clamp untuk memastikan waktu tidak negatif
-      _presetTime = (_presetTime + adjustmentInMillis).clamp(0, 999 * 60 * 1000);
-      
-      // Jika hasilnya adalah 0, kita bisa mengatur timer ke nilai default minimal, misalnya 1 detik.
-      if (_presetTime > 0) {
-        _stopWatchTimer.setPresetSecondTime(_presetTime ~/ 1000); // Set waktu dalam detik
-      } else {
-        _stopWatchTimer.setPresetSecondTime(1); // Set minimal 1 detik
-      }
-      
-      _remainingTime = _presetTime; // Perbarui waktu yang tersisa
+      _sliderValue = value; // Simpan nilai slider
+      final presetTimeInMillis = (_sliderValue * 60 * 1000).toInt(); // Konversi ke milidetik
+      _stopWatchTimer.setPresetSecondTime(presetTimeInMillis ~/ 1000); // Atur waktu dalam detik
+      _remainingTime = presetTimeInMillis; // Perbarui waktu yang tersisa
     });
   }
 
@@ -111,7 +103,7 @@ class _TimerPageState extends State<TimerPage> {
           children: [
             StreamBuilder<int>(
               stream: _stopWatchTimer.rawTime,
-              initialData: _presetTime,
+              initialData: _remainingTime,
               builder: (context, snapshot) {
                 final value = snapshot.data!;
                 final displayTime = StopWatchTimer.getDisplayTime(value);
@@ -120,70 +112,18 @@ class _TimerPageState extends State<TimerPage> {
             ),
             const SizedBox(height: 20),
 
-            // Time Adjustment Buttons with horizontal scroll
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _adjustTime((-5) * 60 * 1000), // Kurangi 5 menit
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue, // Warna utama
-                    foregroundColor: Colors.white, // Teks putih
-                  ),
-                  child: const Text('-5m'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _adjustTime((-60) * 1000), // Kurangi 1 menit
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('-1m'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _adjustTime((-30) * 1000), // Kurangi 30 detik
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('-30s'),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ElevatedButton(
-                  onPressed: () => _adjustTime(30 * 1000), // Tambah 30 detik
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('+30 s'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _adjustTime(60 * 1000), // Tambah 1 menit
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('+1m'),
-                ),
-                const SizedBox(width: 10),
-                ElevatedButton(
-                  onPressed: () => _adjustTime(5 * 60 * 1000), // Tambah 5 menit
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue,
-                    foregroundColor: Colors.white,
-                  ),
-                  child: const Text('+5m'),
-                ),
-              ],
+            // Slider for adjusting time
+            Slider(
+              value: _sliderValue, // Gunakan nilai slider yang diatur
+              min: 0, // Waktu minimal adalah 0 menit
+              max: 60, // Waktu maksimal adalah 60 menit
+              divisions: 60, // Membagi slider ke dalam 60 bagian (per menit)
+              label: '${_sliderValue.toStringAsFixed(0)} min', // Label menit
+              onChanged: _isRunning
+                  ? null // Disable slider if timer is running
+                  : (value) {
+                      _adjustTime(value);
+                    },
             ),
             const SizedBox(height: 20),
 
@@ -193,15 +133,13 @@ class _TimerPageState extends State<TimerPage> {
               children: [
                 ElevatedButton(
                   onPressed: _isRunning ? _pauseTimer : _startTimer,
-                  style: ElevatedButton.styleFrom(
-                  ),
+                  style: ElevatedButton.styleFrom(),
                   child: Text(_isRunning ? 'Pause' : 'Start'),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
                   onPressed: _resetTimer, // Tombol Reset sekarang mengatur waktu ke 0 detik
-                  style: ElevatedButton.styleFrom(
-                  ),
+                  style: ElevatedButton.styleFrom(),
                   child: const Text('Reset'),
                 ),
               ],
@@ -214,9 +152,8 @@ class _TimerPageState extends State<TimerPage> {
                 _pauseTimer(); // Stop timer before saving
                 _saveToHistory(_remainingTime);
               },
-              style: ElevatedButton.styleFrom(
-              ),
-              child: const Text('Finish and Save'),
+              style: ElevatedButton.styleFrom(),
+              child: const Text('Finish & Save'),
             ),
           ],
         ),
