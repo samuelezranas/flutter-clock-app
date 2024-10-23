@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class StopwatchPage extends StatefulWidget {
@@ -12,14 +11,12 @@ class StopwatchPage extends StatefulWidget {
 class _StopwatchPageState extends State<StopwatchPage> {
   final StopWatchTimer _stopWatchTimer = StopWatchTimer();
   bool _isRunning = false; // Status apakah stopwatch sedang berjalan atau tidak
-  late int _elapsedTime;
 
   @override
   void initState() {
     super.initState();
     _stopWatchTimer.rawTime.listen((value) {
       setState(() {
-        _elapsedTime = value;
       });
     });
   }
@@ -32,11 +29,9 @@ class _StopwatchPageState extends State<StopwatchPage> {
 
   void _startStopTimer() {
     if (_isRunning) {
-      // Berhenti jika sedang berjalan
-      _stopWatchTimer.onStopTimer();
+      _stopWatchTimer.onStopTimer(); // Berhenti jika sedang berjalan
     } else {
-      // Mulai jika belum berjalan
-      _stopWatchTimer.onStartTimer();
+      _stopWatchTimer.onStartTimer(); // Mulai jika belum berjalan
     }
     setState(() {
       _isRunning = !_isRunning; // Ganti status tombol
@@ -50,22 +45,21 @@ class _StopwatchPageState extends State<StopwatchPage> {
     });
   }
 
-  void _saveToHistory(int elapsedTime) async {
-    final result = await Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => SaveToHistoryPage(time: elapsedTime),
-      ),
-    );
-    if (result != null && result == true) {
-      print("Data telah disimpan ke history");
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Stopwatch')),
+      appBar: AppBar(
+        title: const Text(
+          'Stopwatch',
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 24,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        elevation: 0.0,
+        centerTitle: true,
+      ),  
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -80,25 +74,44 @@ class _StopwatchPageState extends State<StopwatchPage> {
               },
             ),
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _startStopTimer,
-              child: Text(_isRunning ? 'Stop' : 'Start'), // Ganti label berdasarkan status stopwatch
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _restartTimer, // Tombol untuk restart
-              child: const Text('Restart'),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                if (_isRunning) {
-                  _stopWatchTimer.onStopTimer();
-                  _isRunning = false;
-                }
-                _saveToHistory(_elapsedTime); // Simpan hasil waktu ke history
-              },
-              child: const Text('Finish & Save'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Tombol Start/Stop
+                OutlinedButton(
+                  onPressed: _startStopTimer,
+                  style: OutlinedButton.styleFrom(
+                    shape: const CircleBorder(), // Membuat tombol menjadi bulat
+                    padding: const EdgeInsets.all(20), // Ukuran tombol
+                    side: BorderSide(
+                      color: _isRunning ? Colors.blue : Colors.blue, // Outline berwarna biru
+                      width: 2,
+                    ),
+                    backgroundColor: _isRunning ? Colors.blue : Colors.white, // Background biru saat running
+                  ),
+                  child: Icon(
+                    _isRunning ? Icons.pause : Icons.play_arrow, // Icon play/pause
+                    color: _isRunning ? Colors.white : Colors.blue, // Warna ikon putih saat running
+                    size: 32,
+                  ),
+                ),
+                const SizedBox(width: 20), // Jarak antara tombol
+                // Tombol Restart
+                OutlinedButton(
+                  onPressed: _restartTimer,
+                  style: OutlinedButton.styleFrom(
+                    shape: const CircleBorder(), // Membuat tombol menjadi bulat
+                    padding: const EdgeInsets.all(20), // Ukuran tombol
+                    side: const BorderSide(color: Colors.blue, width: 2), // Outline biru
+                    backgroundColor: Colors.white, // Background putih
+                  ),
+                  child: const Icon(
+                    Icons.restart_alt, // Icon restart
+                    color: Colors.blue, // Warna ikon biru
+                    size: 32,
+                  ),
+                ),
+              ],
             ),
           ],
         ),

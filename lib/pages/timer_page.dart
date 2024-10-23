@@ -115,7 +115,18 @@ class _TimerPageState extends State<TimerPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Timer')),
+      appBar: AppBar(
+        title: const Text(
+          'Timer',
+          style: TextStyle(
+            color: Colors.blue,
+            fontSize: 24,
+            fontWeight: FontWeight.bold
+          ),
+        ),
+        elevation: 0.0,
+        centerTitle: true,
+      ),  
       body: Padding(
         padding: const EdgeInsets.all(40.0),
         child: Column(
@@ -131,7 +142,7 @@ class _TimerPageState extends State<TimerPage> {
                 return Text(
                   displayTime,
                   style: const TextStyle(
-                    fontSize: 40,
+                    fontSize: 50,
                     fontFeatures: [
                       FontFeature.tabularFigures(),
                     ],
