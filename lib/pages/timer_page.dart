@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key});
@@ -19,6 +18,7 @@ class _TimerPageState extends State<TimerPage> {
   bool _isRunning = false;
   double _sliderValue = 0;
   int _remainingTime = 0;
+  double _initialTime = 0;
 
   @override
   void initState() {
@@ -40,16 +40,21 @@ class _TimerPageState extends State<TimerPage> {
           _isRunning = false;
           _sliderValue = 0;
         });
-      // Menampilkan toast
-        Fluttertoast.showToast(
-          msg: "Timer ${(_sliderValue * 60).toStringAsFixed(0)} menit telah selesai",
-          toastLength: Toast.LENGTH_LONG,
-          gravity: ToastGravity.BOTTOM,
-          timeInSecForIosWeb: 3,
-          backgroundColor: Colors.black87,
-          textColor: Colors.white,
-          fontSize: 16.0
-        );
+        
+        // Menampilkan SnackBar dengan posisi yang disesuaikan
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Timer ${(_initialTime.toStringAsFixed(0))} menit telah selesai",
+                textAlign: TextAlign.center,
+              ),
+              duration: const Duration(seconds: 7),
+              // Hapus behavior: SnackBarBehavior.floating dan margin
+              backgroundColor: Colors.blue,
+            ),
+          );
+        }
       }
     });
   }
@@ -74,6 +79,8 @@ class _TimerPageState extends State<TimerPage> {
 
   void _startTimer() {
     if (_sliderValue > 0) {
+      // Simpan nilai awal saat timer dimulai
+      _initialTime = _sliderValue;
       // Set ulang waktu sesuai nilai slider sebelum memulai timer
       final timeInMillis = (_sliderValue * 60 * 1000).toInt();
       _stopWatchTimer.setPresetTime(mSec: timeInMillis, add: false);
@@ -98,6 +105,7 @@ class _TimerPageState extends State<TimerPage> {
       _isRunning = false;
       _sliderValue = 0;
       _remainingTime = 0;
+      _initialTime = 0;
     });
   }
 
@@ -107,6 +115,7 @@ class _TimerPageState extends State<TimerPage> {
       setState(() {
         _sliderValue = value;
         _remainingTime = timeInMillis;
+        _initialTime = value; // Update nilai awal saat slider diubah
       });
       // Set waktu preset saat slider diubah
       _stopWatchTimer.setPresetTime(mSec: timeInMillis, add: false);
