@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_clock_app/model/save_to_history.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class TimerPage extends StatefulWidget {
   const TimerPage({super.key});
@@ -39,6 +40,16 @@ class _TimerPageState extends State<TimerPage> {
           _isRunning = false;
           _sliderValue = 0;
         });
+      // Menampilkan toast
+        Fluttertoast.showToast(
+          msg: "Timer ${(_sliderValue * 60).toStringAsFixed(0)} menit telah selesai",
+          toastLength: Toast.LENGTH_LONG,
+          gravity: ToastGravity.BOTTOM,
+          timeInSecForIosWeb: 3,
+          backgroundColor: Colors.black87,
+          textColor: Colors.white,
+          fontSize: 16.0
+        );
       }
     });
   }
