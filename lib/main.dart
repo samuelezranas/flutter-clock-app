@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_clock_app/pages/history.dart';
+import 'package:flutter_clock_app/pages/alarm_page.dart';
 import 'package:flutter_clock_app/pages/stopwatch_page.dart';
 import 'package:flutter_clock_app/pages/timer_page.dart';
 import 'package:flutter_clock_app/widget/bottom_navbar.dart';
@@ -38,7 +38,7 @@ class _MainScreenState extends State<MainScreen> {
   final List<Widget> _pages = [
     const StopwatchPage(),
     const TimerPage(),
-    const HistoryPage(),
+    AlarmPage(),
   ];
 
   void _onItemTapped(int index) {

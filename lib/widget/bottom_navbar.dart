@@ -26,8 +26,8 @@ class BottomNavBar extends StatelessWidget {
           label: 'Timer',
         ),
         BottomNavigationBarItem(
-          icon: Icon(Icons.history),
-          label: 'History',
+          icon: Icon(Icons.alarm),
+          label: 'Alarm',
         ),
       ],
     );
