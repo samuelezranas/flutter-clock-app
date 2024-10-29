@@ -1,11 +1,22 @@
+import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_clock_app/pages/alarm_page.dart';
 import 'package:flutter_clock_app/pages/stopwatch_page.dart';
 import 'package:flutter_clock_app/pages/timer_page.dart';
 import 'package:flutter_clock_app/widget/bottom_navbar.dart';
 
-void main() {
-  runApp(const MyApp());
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+
+  await Alarm.init();
+
+  runApp(
+    MaterialApp(
+      home: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
