@@ -1,10 +1,10 @@
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_clock_app/pages/alarm_page.dart';
-import 'package:flutter_clock_app/pages/stopwatch_page.dart';
-import 'package:flutter_clock_app/pages/timer_page.dart';
-import 'package:flutter_clock_app/widget/bottom_navbar.dart';
+import 'package:blueclock/pages/alarm_page.dart';
+import 'package:blueclock/pages/stopwatch_page.dart';
+import 'package:blueclock/pages/timer_page.dart';
+import 'package:blueclock/widget/bottom_navbar.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -14,6 +14,7 @@ Future<void> main() async {
 
   runApp(
     MaterialApp(
+      theme: ThemeData(useMaterial3: false),
       home: const MyApp(),
     ),
   );
@@ -26,7 +27,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false, 
-      title: 'Flutter Stopwatch',
+      title: 'Flutter blueclock',
       theme: ThemeData(
         primaryColor: Colors.blue,
         primarySwatch: Colors.blue,

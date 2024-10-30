@@ -33,7 +33,7 @@ class _TimerPageState extends State<TimerPage> {
       });
 
       if (value <= 0 && _isRunning) {
-        await audioPlayer.play(AssetSource('audio/marimba.mp3'));
+        await audioPlayer.play(AssetSource('audio/laser.mp3'));
         _stopWatchTimer.onStopTimer();
         setState(() {
           _isRunning = false;

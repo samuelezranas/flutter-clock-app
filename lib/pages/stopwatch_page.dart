@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
@@ -27,7 +29,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
     super.dispose();
   }
 
-  void _startStopTimer() {
+  Future <void> _startStopTimer() async {
     if (_isRunning) {
       _stopWatchTimer.onStopTimer(); // Berhenti jika sedang berjalan
     } else {
@@ -38,7 +40,7 @@ class _StopwatchPageState extends State<StopwatchPage> {
     });
   }
 
-  void _restartTimer() {
+  Future <void> _restartTimer() async {
     _stopWatchTimer.onResetTimer(); // Reset waktu ke 0
     setState(() {
       _isRunning = false; // Reset status tombol

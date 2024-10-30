@@ -3,16 +3,16 @@ import 'dart:io';
 import 'package:alarm/alarm.dart';
 import 'package:flutter/material.dart';
 
-class ExampleAlarmEditScreen extends StatefulWidget {
-  const ExampleAlarmEditScreen({super.key, this.alarmSettings});
+class AlarmEditScreen extends StatefulWidget {
+  const AlarmEditScreen({super.key, this.alarmSettings});
 
   final AlarmSettings? alarmSettings;
 
   @override
-  State<ExampleAlarmEditScreen> createState() => _ExampleAlarmEditScreenState();
+  State<AlarmEditScreen> createState() => _AlarmEditScreenState();
 }
 
-class _ExampleAlarmEditScreenState extends State<ExampleAlarmEditScreen> {
+class _AlarmEditScreenState extends State<AlarmEditScreen> {
   bool loading = false;
 
   late bool creating;
@@ -101,7 +101,7 @@ class _ExampleAlarmEditScreenState extends State<ExampleAlarmEditScreen> {
       assetAudioPath: assetAudio,
       warningNotificationOnKill: Platform.isIOS,
       notificationSettings: NotificationSettings(
-        title: 'Alarm example',
+        title: 'Alarm ',
         body: 'Your alarm ($id) is ringing',
         stopButton: 'Stop the alarm',
         icon: 'notification_icon',
@@ -217,24 +217,28 @@ class _ExampleAlarmEditScreenState extends State<ExampleAlarmEditScreen> {
                 value: assetAudio,
                 items: const [
                   DropdownMenuItem<String>(
-                    value: 'assets/marimba.mp3',
+                    value: 'assets/audio/marimba.mp3',
                     child: Text('Marimba'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'assets/nokia.mp3',
+                    value: 'assets/audio/nokia.mp3',
                     child: Text('Nokia'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'assets/mozart.mp3',
+                    value: 'assets/audio/mozart.mp3',
                     child: Text('Mozart'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'assets/star_wars.mp3',
+                    value: 'assets/audio/star_wars.mp3',
                     child: Text('Star Wars'),
                   ),
                   DropdownMenuItem<String>(
-                    value: 'assets/one_piece.mp3',
+                    value: 'assets/audio/one_piece.mp3',
                     child: Text('One Piece'),
+                  ),
+                  DropdownMenuItem<String>(
+                    value: 'assets/audio/laser.mp3',
+                    child: Text('Laser'),
                   ),
                 ],
                 onChanged: (value) => setState(() => assetAudio = value!),
@@ -245,7 +249,7 @@ class _ExampleAlarmEditScreenState extends State<ExampleAlarmEditScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Custom volume',
+                'Set volume manual',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               Switch(
@@ -283,7 +287,7 @@ class _ExampleAlarmEditScreenState extends State<ExampleAlarmEditScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Fade duration',
+                'Duration',
                 style: Theme.of(context).textTheme.titleMedium,
               ),
               DropdownButton<double>(

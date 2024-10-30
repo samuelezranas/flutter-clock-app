@@ -1,4 +1,4 @@
-name: flutter_clock_app
+name: blueclock
 description: "A new Flutter project."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -55,7 +55,9 @@ dependencies:
   fluttertoast: ^8.2.4
 
   alarm: ^4.0.8
+
   permission_handler: ^11.3.1
+
   url_launcher: ^6.3.1
 
 dev_dependencies:

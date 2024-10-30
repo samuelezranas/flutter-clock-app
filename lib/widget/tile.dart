@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-class ExampleAlarmTile extends StatelessWidget {
-  const ExampleAlarmTile({
+class AlarmTile extends StatelessWidget {
+  const AlarmTile({
     required this.title,
     required this.onPressed,
     super.key,
